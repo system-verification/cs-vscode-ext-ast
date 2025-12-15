@@ -1,0 +1,25 @@
+# Node / TypeScript artifacts
+node_modules/
+out/
+*.tsbuildinfo
+
+# ExTester cached VS Code installs
+.vscode-test/
+
+# Logs & diagnostics
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# VS Code
+.vscode/
+
+# OS junk files
+.DS_Store
+Thumbs.db
+
+# local files
+*.vsix
+*.zip
+tmp/
+local.json
