@@ -18,8 +18,8 @@
     "prepare:vscode": "node ./scripts/stage-local-vscode.js",
     "stage:vsix": "node ./scripts/apply-vsix-config.js --stage-only",
     "build": "tsc -p tsconfig.json",
-    "test": "npm run prepare:vscode && npm run build && node ./scripts/install-codescene-extension.js && extest run-tests \"./out/tests/**/*.test.js\" --storage .vscode-test --extensions_dir .vscode-test/extensions --code_settings ./extester.settings.json",
-    "test:insiders": "npm run prepare:vscode && npm run build && extest setup-and-run \"./out/tests/**/*.test.js\" --type insider --code_version max --storage .vscode-test --extensions_dir .vscode-test/extensions --code_settings ./extester.settings.json"
+    "test": "npm run prepare:vscode && npm run build && node ./scripts/install-codescene-extension.js && node ./scripts/prepare-settings-with-token.js && extest run-tests \"./out/tests/**/*.test.js\" --storage .vscode-test --extensions_dir .vscode-test/extensions --code_settings ./.vscode-test/settings.with-token.json --mocha_config ./mocharc.json",
+    "test:insiders": "npm run prepare:vscode && npm run build && node ./scripts/install-codescene-extension.js && node ./scripts/prepare-settings-with-token.js && extest run-tests \"./out/tests/**/*.test.js\" --type insider --code_version max --storage .vscode-test --extensions_dir .vscode-test/extensions --code_settings ./.vscode-test/settings.with-token.json --mocha_config ./mocharc.json"
   },
   "devDependencies": {
     "async-retry": "^1.3.3",
