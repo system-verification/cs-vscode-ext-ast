@@ -45,8 +45,6 @@ describe('CodeScene Ext Health Monitor', function () {
     await driver.switchTo().frame(await webview.find('outerFrame'));
     await driver.switchTo().frame(await webview.find('healthMonitorFrame'))
 
-    await pauseTest(10000)
-
     const csHealthMonitor = new CSHealthMonitorPage()
     expect(await (await csHealthMonitor.find('title')).getText()).to.contain('Health Monitor')
 
@@ -57,6 +55,11 @@ describe('CodeScene Ext Health Monitor', function () {
       expect(await csHealthMonitor.find('impactAnalysis [matching: SessionController]')).to.exist
     })
     expect(performance.now() - assertionStart).to.be.below(5000)
+
+    // Simulate user reading the analysis
+    // Verify that Health Monitor is still visible
+    await pauseTest(10000)
+    expect(await (await csHealthMonitor.find('title')).getText()).to.contain('Health Monitor')
 
     await driver.switchTo().defaultContent()
   });
