@@ -30,7 +30,7 @@ function normalizeError(error: unknown): Error {
 
 function isRetryableError(error: Error): boolean {
   const name = error.name ?? '';
-  return name.includes('StaleElementReference') || name.includes('NoSuchWindow');
+  return name.includes('StaleElementReference') || name.includes('NoSuchWindow') || name.includes('AssertionError');
 }
 
 const DEFAULT_WAIT_TIMEOUT = 10000;
