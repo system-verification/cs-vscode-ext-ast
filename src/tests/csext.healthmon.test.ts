@@ -27,7 +27,7 @@ describe('CodeScene Ext Health Monitor', function () {
       await commandExecute(projectDir, 'git', 'restore', '.')
   })
 
-  it('Verify CS Health Monitor with file change', async function () {
+  it('Verify CS Health Monitor analysis for file update', async function () {
     // Open some file in Explorer
     const explorer = new ExplorerPage()
     expect(await explorer.visible('id')).to.be.true
