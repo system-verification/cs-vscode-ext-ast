@@ -74,6 +74,10 @@ Prefer launching UI tests from inside VS Code? Install the [ExTester Runner](htt
 
 - Keep `npm run build` (or `npm run build -- --watch`) running so compiled files in `out/` stay in sync before you hit the run buttons in the UI.
 - Run `npm run prepare:vscode` anytime you update the local VS Code or ChromeDriver artifacts, and `npm run stage:vsix` after producing a new VSIX. The runner only invokes `extest setup-and-run`, so it does not restage these assets for you.
+- Quick refresher on those helper scripts:
+	- `npm run prepare:vscode` → stages your configured local VS Code build plus ChromeDriver copies into `.vscode-test/` so ExTester skips re-downloading them.
+	- `npm run stage:vsix` → installs every VSIX path listed in `extester.local-vsix.json` into `.vscode-test/extensions` without launching tests.
+	- `npm run build` → compiles the TypeScript sources into `out/`, ensuring ExTester Runner sees fresh JavaScript.
 - The workspace already contains `.vscode/settings.json` entries that point the runner at the same cache/storage folders used by `npm run test`:
 
 ```jsonc
@@ -97,6 +101,10 @@ With these settings active, ExTester Runner reuses the staged VS Code build, the
 
 - Open the TypeScript test you want to investigate and launch the `Debug Current UI Test File` configuration from the Run and Debug view.
 - The debugger runs the `prep-ui-tests` task first (`npm run prepare:vscode` ➝ `npm run stage:vsix` ➝ `npm run build`) so cached assets, VSIX installs, and compiled output are aligned.
+- That task is defined in `.vscode/tasks.json` and sequences:
+	- `npm: prepare:vscode` → stages VS Code + ChromeDriver if `extester.local-*` configs are present.
+	- `npm: stage:vsix` → installs VSIX files from `extester.local-vsix.json` into `.vscode-test/extensions`.
+	- `npm: build` → compiles TypeScript to `out/` (wired to the `$tsc` problem matcher for quick diagnostics).
 - `scripts/debug-test-file.js` maps the active `.test.ts` file to `out/`, stages VS Code/ChromeDriver plus VSIX entries, and calls the ExTester API (`setupAndRunTests`) to run only that file, so breakpoints hit exactly once per run.
 - You can also execute the helper manually for ad-hoc runs:
 
