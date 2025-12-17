@@ -1,5 +1,6 @@
 import { WebDriver } from 'selenium-webdriver';
 import { BasePage, type LocatorDictionary } from './base.page'
+import { WebViewPage } from './webview.page'
 
 export class CSHealthMonitorPage extends BasePage {
 
@@ -16,4 +17,11 @@ export class CSHealthMonitorPage extends BasePage {
         }
     }
 
+    async init(): Promise<CSHealthMonitorPage> {
+        const webview = new WebViewPage()
+        await this.driver.switchTo().defaultContent()
+        await this.driver.switchTo().frame(await webview.find('outerFrame'))
+        await this.driver.switchTo().frame(await webview.find('healthMonitorFrame'))
+        return this
+    }
 }

@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { promises as fs } from 'node:fs'
 import * as path from 'node:path'
 import { ExplorerPage } from '../fw/explorer.page'
@@ -7,6 +8,17 @@ type ActiveFileUpdateParams = {
 	fromLine: number
 	toLine: number
 	snippet: string
+}
+
+export async function explorerFileEdit(
+	fileNameList: string[],
+	update: ActiveFileUpdateParams): Promise<ExplorerPage> {
+
+	const explorer = new ExplorerPage()
+	expect(await explorer.visible('id')).to.be.true
+	await explorerFileOpen(explorer, fileNameList)
+	await explorerActiveFileUpdate(update)
+	return explorer
 }
 
 export async function explorerFileOpen(explorer: ExplorerPage, matchingSegments: string[]): Promise<void> {

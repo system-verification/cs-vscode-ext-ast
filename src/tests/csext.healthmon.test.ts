@@ -1,14 +1,12 @@
 import { expect } from 'chai';
 import { homedir } from 'node:os'
 import * as path from 'node:path'
-import { ActivityBar, VSBrowser } from 'vscode-extension-tester';
-import { waitFor, runWithRetry } from '../utils/repeat';
-import { ensureSuiteTimeout, commandExecute, pauseTest } from '../utils/generic';
-import { applyConfiguredWindowSize } from '../utils/windowSizing';
-import { ExplorerPage } from '../fw/explorer.page'
-import { WebViewPage } from '../fw/webview.page'
+import { VSBrowser } from 'vscode-extension-tester';
+import { runWithRetry } from '../utils/repeat';
+import { ensureSuiteTimeout, applyVSCodeWindowUpdate, commandExecute, pauseTest } from '../utils/generic';
 import { CSHealthMonitorPage } from '../fw/cshealthmonitor.page'
-import { explorerFileOpen, explorerActiveFileUpdate } from '../concepts/explorer'
+import { explorerFileEdit } from '../concepts/explorer'
+import { workbenchCSHealthMonitorOpen } from '../concepts/workbench'
 
 
 describe('CodeScene Ext Health Monitor', function () {
@@ -20,7 +18,7 @@ describe('CodeScene Ext Health Monitor', function () {
   before(async () => {
     await VSBrowser.instance.openResources(projectDir)
     await commandExecute(projectDir, 'git', 'restore', '.')
-    await applyConfiguredWindowSize()
+    await applyVSCodeWindowUpdate()
   });
 
   afterEach(async () => {
@@ -28,24 +26,10 @@ describe('CodeScene Ext Health Monitor', function () {
   })
 
   it('Verify CS Health Monitor analysis for file update', async function () {
-    // Open some file in Explorer
-    const explorer = new ExplorerPage()
-    expect(await explorer.visible('id')).to.be.true
-    await explorerFileOpen(explorer, ['Controllers', 'SessionController'])
-    await explorerActiveFileUpdate({ fromLine: 8, toLine: 8, snippet: '\n\n\n' })
+    await explorerFileEdit(['Controllers', 'SessionController'], { fromLine: 8, toLine: 8, snippet: '\n\n\n' })
+    await workbenchCSHealthMonitorOpen()
 
-    await runWithRetry(async () => {
-      const activityBar = new ActivityBar()
-      const codeSceneControl = await waitFor(() => activityBar.getViewControl('CodeScene'))
-      await codeSceneControl!.openView()
-    })
-
-    const driver = VSBrowser.instance.driver
-    const webview = new WebViewPage()
-    await driver.switchTo().frame(await webview.find('outerFrame'));
-    await driver.switchTo().frame(await webview.find('healthMonitorFrame'))
-
-    const csHealthMonitor = new CSHealthMonitorPage()
+    const csHealthMonitor = await new CSHealthMonitorPage().init()
     expect(await (await csHealthMonitor.find('title')).getText()).to.contain('Health Monitor')
 
     const assertionStart = performance.now()
@@ -60,7 +44,5 @@ describe('CodeScene Ext Health Monitor', function () {
     // Verify that Health Monitor is still visible
     await pauseTest(10000)
     expect(await (await csHealthMonitor.find('title')).getText()).to.contain('Health Monitor')
-
-    await driver.switchTo().defaultContent()
   });
 });

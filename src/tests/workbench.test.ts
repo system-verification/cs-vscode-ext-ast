@@ -1,14 +1,15 @@
 import { expect } from 'chai';
 import { VSBrowser, Workbench } from 'vscode-extension-tester';
-
-import { applyConfiguredWindowSize } from '../utils/windowSizing';
+import { ensureSuiteTimeout, applyVSCodeWindowUpdate } from '../utils/generic';
 
 // Simple smoke test to confirm VS Code launches under eXTester control
 describe('Workbench smoke test', function () {
+  ensureSuiteTimeout(this)
+
   before(async () => {
     // Ensure VS Code is ready before running assertions
     await VSBrowser.instance.openResources()
-    await applyConfiguredWindowSize()
+    await applyVSCodeWindowUpdate()
   });
 
   it('Verify vstest', async () => {
