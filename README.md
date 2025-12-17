@@ -1,6 +1,6 @@
-# eXTester Workspace
+# CodeScene VSCode extension Automated System Test
 
-This repository hosts a minimal [ExTester](https://github.com/redhat-developer/vscode-extension-tester) setup you can use to UI-test Visual Studio Code extensions. It wires TypeScript-based Mocha tests into the `extest` CLI so you can rapidly validate extension flows in a headless or GUI run.
+This repository hosts [ExTester](https://github.com/redhat-developer/vscode-extension-tester) setup you can use to UI-test Visual Studio Code CodeScene extensions. It wires TypeScript-based Mocha tests into the `extest` CLI so you can rapidly validate extension flows in a headless or GUI run.
 
 ## Requirements
 
