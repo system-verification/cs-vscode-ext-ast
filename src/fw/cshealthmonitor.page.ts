@@ -11,17 +11,20 @@ export class CSHealthMonitorPage extends BasePage {
     private static initLocators(): LocatorDictionary {
         return {
             title: 'h1',
+            outerFrame: 'iframe.webview',
+            healthMonitorFrame: 'iframe[title=""]',
             noCodeImpact: '//*[contains(text(), "No code health impact detected in changes to your files")]',
             negativeCodeImpact: '//*[contains(text(), "Negative impact of your changes")]',
-            impactAnalysis: 'div[role="monitor-file-card"][aria-label*="dynamic_content"]'
+            impactFile: '//div[@role="monitor-file-card"]//*[contains(text(),"dynamic_content")]',
+            impactFunction: '//div[@role="monitor-file-card"]//*[contains(text(),"dynamic_content")]',
+            autoRefactor: '//button//*[contains(text(), "Auto-Refactor")]'
         }
     }
 
     async init(): Promise<CSHealthMonitorPage> {
-        const webview = new WebViewPage()
         await this.driver.switchTo().defaultContent()
-        await this.driver.switchTo().frame(await webview.find('outerFrame'))
-        await this.driver.switchTo().frame(await webview.find('healthMonitorFrame'))
+        await this.driver.switchTo().frame(await this.find('outerFrame'))
+        await this.driver.switchTo().frame(await this.find('healthMonitorFrame'))
         return this
     }
 }

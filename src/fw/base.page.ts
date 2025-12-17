@@ -44,7 +44,7 @@ export class BasePage {
 		}
 
 		const normalized = locator.trim();
-		return normalized.startsWith('//') ? By.xpath(normalized) : By.css(normalized);
+		return normalized.startsWith('//') || normalized.startsWith('(') ? By.xpath(normalized) : By.css(normalized);
 	}
 
     private tryGetLocator(logicalName: string): string | undefined {

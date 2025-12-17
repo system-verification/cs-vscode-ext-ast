@@ -9,7 +9,7 @@ export class WebViewPage extends BasePage {
     private static initLocators(): LocatorDictionary {
         return {
             outerFrame: 'iframe.webview',
-            activeFrame: 'iframe#active-frame',
+            outerACEFrame: '//iframe[contains(@name,"a64c")]',
             healthMonitorFrame: 'iframe[title=""]',
             aceFrame: 'iframe[title="CodeScene ACE"]'
         }

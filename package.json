@@ -16,6 +16,7 @@
   "scripts": {
     "clean": "rimraf out .vscode-test",
     "prepare:vscode": "node ./scripts/stage-local-vscode.js",
+    "prepare:token": "node ./scripts/prepare-settings-with-token.js",
     "stage:vsix": "node ./scripts/apply-vsix-config.js --stage-only",
     "build": "tsc -p tsconfig.json",
     "test": "npm run prepare:vscode && npm run build && node ./scripts/install-codescene-extension.js && node ./scripts/prepare-settings-with-token.js && extest run-tests \"./out/tests/**/*.test.js\" --storage .vscode-test --extensions_dir .vscode-test/extensions --code_settings ./.vscode-test/settings.with-token.json --mocha_config ./mocharc.json",

@@ -5,11 +5,12 @@ import { VSBrowser } from 'vscode-extension-tester';
 import { runWithRetry } from '../utils/repeat';
 import { ensureSuiteTimeout, applyVSCodeWindowUpdate, commandExecute, pauseTest } from '../utils/generic';
 import { CSHealthMonitorPage } from '../fw/cshealthmonitor.page'
+import { CSACEPage } from '../fw/csace.page'
 import { explorerFileEdit } from '../concepts/explorer'
 import { workbenchCSHealthMonitorOpen } from '../concepts/workbench'
 
 
-describe('CodeScene Ext Health Monitor', function () {
+describe('CodeScene Ext ACE', function () {
 
   ensureSuiteTimeout(this)
   const GIT_PROJECT = 'FlaUI.WebDriver'
@@ -25,24 +26,28 @@ describe('CodeScene Ext Health Monitor', function () {
       await commandExecute(projectDir, 'git', 'restore', '.')
   })
 
-  it('Verify CS Health Monitor analysis for file update', async function () {
+  it('Verify CS ACE analysis', async function () {
     await explorerFileEdit(['Controllers', 'SessionController'], { fromLine: 8, toLine: 8, snippet: '\n\n\n' })
     await workbenchCSHealthMonitorOpen()
 
     const csHealthMonitor = await new CSHealthMonitorPage().init()
     expect(await (await csHealthMonitor.find('title')).getText()).to.contain('Health Monitor')
 
+    var impactFile
     const assertionStart = performance.now()
     await runWithRetry(async () => {
-      expect(await csHealthMonitor.find('noCodeImpact', false)).to.be.undefined
-      expect(await csHealthMonitor.find('negativeCodeImpact')).to.exist
-      expect(await csHealthMonitor.find('impactFile [matching: SessionController]')).to.exist
+      impactFile = await csHealthMonitor.find('impactFile [matching: SessionController]')
+      expect(impactFile).to.exist
     })
     expect(performance.now() - assertionStart).to.be.below(5000)
 
-    // Simulate user reading the analysis
-    // Verify that Health Monitor is still visible
-    await pauseTest(10000)
-    expect(await (await csHealthMonitor.find('title')).getText()).to.contain('Health Monitor')
+    await impactFile!.click()
+    await runWithRetry(async () => {
+      await (await csHealthMonitor.find('impactFunction [matching: GetApp]')).click()
+      await (await csHealthMonitor.find('autoRefactor')).click()
+    })
+
+    const csACE = await new CSACEPage().init()
+    expect(await csACE.find('impactFile [matching: SessionController]')).to.exist
   });
 });

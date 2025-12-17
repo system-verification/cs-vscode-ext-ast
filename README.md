@@ -17,6 +17,34 @@ npm run test
 
 The first test run downloads a dedicated copy of VS Code, ChromeDriver, and spins up the sample smoke test in `src/tests/sample.test.ts`.
 
+## Manual Environment Setup (No Tests)
+Update **local.json** with the CodeScene authentication token
+
+```
+{
+    "codescene.id": "codescene.codescene-vscode",
+    "codescene.version": "0.21.0",
+    "codescene.authToken": "xxx"
+}
+```
+
+Need the cache staged but do not want to launch tests yet? Run these commands in PowerShell:
+
+```powershell
+npm install
+node .\scripts\prepare-settings-with-token.js
+node .\scripts\install-codescene-extension.js
+npx extest setup-tests --storage .vscode-test --extensions_dir .vscode-test/extensions --type stable --code_version latest
+npm run prepare:vscode
+npm run build
+```
+
+After this sequence, `.vscode-test/` contains the downloaded VS Code + ChromeDriver pair, your VSIX payload is staged, the tokenized settings file exists, and the TypeScript sources are compiled. Whenever you are ready to execute the suite, re-export the token if you start a new shell and run `npm test`.
+
+When a token is updated in **local.json**, rerun:
+- npm run prepare:token
+- npm run build
+
 ## NPM Scripts
 
 - `npm run build` – compiles TypeScript sources into `out/`
@@ -73,10 +101,11 @@ Example:
 Prefer launching UI tests from inside VS Code? Install the [ExTester Runner](https://marketplace.visualstudio.com/items?itemName=redhat.extester-runner) extension and follow this workflow:
 
 - Keep `npm run build` (or `npm run build -- --watch`) running so compiled files in `out/` stay in sync before you hit the run buttons in the UI.
-- Run `npm run prepare:vscode` anytime you update the local VS Code or ChromeDriver artifacts, and `npm run stage:vsix` after producing a new VSIX. The runner only invokes `extest setup-and-run`, so it does not restage these assets for you.
+- Run `npm run prepare:vscode` anytime you update the local VS Code or ChromeDriver artifacts, `npm run stage:vsix` after producing a new VSIX, and `npm run prepare:token` whenever you change `local.json`. The runner only invokes `extest setup-and-run`, so it does not restage these assets for you.
 - Quick refresher on those helper scripts:
 	- `npm run prepare:vscode` → stages your configured local VS Code build plus ChromeDriver copies into `.vscode-test/` so ExTester skips re-downloading them.
 	- `npm run stage:vsix` → installs every VSIX path listed in `extester.local-vsix.json` into `.vscode-test/extensions` without launching tests.
+	- `npm run prepare:token` → merges `extester.settings.json` with `local.json` and writes `.vscode-test/settings.with-token.json`, ensuring `codescene.authToken` is available to ExTester Runner.
 	- `npm run build` → compiles the TypeScript sources into `out/`, ensuring ExTester Runner sees fresh JavaScript.
 - The workspace already contains `.vscode/settings.json` entries that point the runner at the same cache/storage folders used by `npm run test`:
 
@@ -90,7 +119,7 @@ Prefer launching UI tests from inside VS Code? Install the [ExTester Runner](htt
 	"extesterRunner.visualStudioCode.Type": "stable",
 	"extesterRunner.additionalArgs": [
 		"--extensions_dir .vscode-test/extensions",
-		"--code_settings ./extester.settings.json"
+		"--code_settings ./.vscode-test/settings.with-token.json"
 	]
 }
 ```
@@ -100,10 +129,11 @@ With these settings active, ExTester Runner reuses the staged VS Code build, the
 ## Debugging Individual UI Tests
 
 - Open the TypeScript test you want to investigate and launch the `Debug Current UI Test File` configuration from the Run and Debug view.
-- The debugger runs the `prep-ui-tests` task first (`npm run prepare:vscode` ➝ `npm run stage:vsix` ➝ `npm run build`) so cached assets, VSIX installs, and compiled output are aligned.
+- The debugger runs the `prep-ui-tests` task first (`npm run prepare:vscode` ➝ `npm run stage:vsix` ➝ `npm run prepare:token` ➝ `npm run build`) so cached assets, VSIX installs, tokenized settings, and compiled output stay aligned.
 - That task is defined in `.vscode/tasks.json` and sequences:
 	- `npm: prepare:vscode` → stages VS Code + ChromeDriver if `extester.local-*` configs are present.
 	- `npm: stage:vsix` → installs VSIX files from `extester.local-vsix.json` into `.vscode-test/extensions`.
+	- `npm: prepare:token` → writes `.vscode-test/settings.with-token.json` so the CodeScene auth token is present.
 	- `npm: build` → compiles TypeScript to `out/` (wired to the `$tsc` problem matcher for quick diagnostics).
 - `scripts/debug-test-file.js` maps the active `.test.ts` file to `out/`, stages VS Code/ChromeDriver plus VSIX entries, and calls the ExTester API (`setupAndRunTests`) to run only that file, so breakpoints hit exactly once per run.
 - You can also execute the helper manually for ad-hoc runs:
