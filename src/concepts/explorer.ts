@@ -1,5 +1,7 @@
+import { promises as fs } from 'node:fs'
+import * as path from 'node:path'
 import { ExplorerPage } from '../fw/explorer.page'
-import { TextEditor } from 'vscode-extension-tester'
+import { TextEditor, VSBrowser } from 'vscode-extension-tester'
 
 type ActiveFileUpdateParams = {
 	fromLine: number
@@ -14,9 +16,19 @@ export async function explorerFileOpen(explorer: ExplorerPage, matchingSegments:
 	}
 }
 
-export async function exlorerActiveFileUpdate({ fromLine, toLine, snippet }: ActiveFileUpdateParams): Promise<void> {
+export async function explorerActiveFileUpdate({ fromLine, toLine, snippet }: ActiveFileUpdateParams): Promise<void> {
 	const editor = new TextEditor()
-	const documentText = await editor.getText()
+	await editor.moveCursor(fromLine, 1)
+
+	const filePath = await editor.getFilePath()
+	if (!filePath) {
+		throw new Error('Unable to resolve active editor file path')
+	}
+
+	const workspaceRoot = process.cwd()
+	const relativeFilePath = path.relative(workspaceRoot, filePath)
+
+	const documentText = await fs.readFile(filePath, 'utf-8')
 	const newline = documentText.includes('\r\n') ? '\r\n' : '\n'
 	const lines = documentText.length > 0 ? documentText.split(/\r?\n/) : []
 
@@ -33,6 +45,11 @@ export async function exlorerActiveFileUpdate({ fromLine, toLine, snippet }: Act
 	]
 
 	const normalizedText = updatedLines.join(newline)
-	await editor.setText(normalizedText)
-	await editor.save()
+	await fs.writeFile(filePath, normalizedText, 'utf-8')
+
+	const resourceToOpen = relativeFilePath.length > 0 ? relativeFilePath : filePath
+	await VSBrowser.instance.openResources(resourceToOpen, async () => {
+		const refreshedEditor = new TextEditor()
+		await refreshedEditor.moveCursor(fromLine, 1)
+	})
 }

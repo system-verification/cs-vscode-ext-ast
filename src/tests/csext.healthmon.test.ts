@@ -8,7 +8,7 @@ import { applyConfiguredWindowSize } from '../utils/windowSizing';
 import { ExplorerPage } from '../fw/explorer.page'
 import { WebViewPage } from '../fw/webview.page'
 import { CSHealthMonitorPage } from '../fw/cshealthmonitor.page'
-import { explorerFileOpen, exlorerActiveFileUpdate } from '../concepts/explorer'
+import { explorerFileOpen, explorerActiveFileUpdate } from '../concepts/explorer'
 
 
 describe('CodeScene Ext Health Monitor', function () {
@@ -32,7 +32,7 @@ describe('CodeScene Ext Health Monitor', function () {
     const explorer = new ExplorerPage()
     expect(await explorer.visible('id')).to.be.true
     await explorerFileOpen(explorer, ['Controllers', 'SessionController'])
-    await exlorerActiveFileUpdate({ fromLine: 8, toLine: 8, snippet: '\n\n\n' })
+    await explorerActiveFileUpdate({ fromLine: 8, toLine: 8, snippet: '\n\n\n' })
 
     await runWithRetry(async () => {
       const activityBar = new ActivityBar()
