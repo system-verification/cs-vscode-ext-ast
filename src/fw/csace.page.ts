@@ -14,6 +14,8 @@ export class CSACEPage extends BasePage {
             outerACEFrame: '(//iframe[contains(@class,"ready")])[2]',
             aceFrame: '//iframe[contains(@title,"CodeScene ACE")]',
             impactFile: '//div//*[contains(text(),"dynamic_content")]',
+            enableACE: '//button//div[contains(text(),"Enable CodeScene ACE")]',
+            acceptAutoRefactor: '//button//div[contains(text(),"Accept Auto-Refactor")]'
         }
     }
 

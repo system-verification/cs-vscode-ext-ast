@@ -7,7 +7,7 @@ import { ensureSuiteTimeout, applyVSCodeWindowUpdate, commandExecute, pauseTest 
 import { CSHealthMonitorPage } from '../fw/cshealthmonitor.page'
 import { CSACEPage } from '../fw/csace.page'
 import { explorerFileEdit } from '../concepts/explorer'
-import { workbenchCSHealthMonitorOpen } from '../concepts/workbench'
+import { workbenchCSHealthMonitorOpen, workbenchExplorerOpen } from '../concepts/workbench'
 
 
 describe('CodeScene Ext ACE', function () {
@@ -26,8 +26,11 @@ describe('CodeScene Ext ACE', function () {
       await commandExecute(projectDir, 'git', 'restore', '.')
   })
 
-  it('Verify CS ACE analysis', async function () {
+  it('Verify CS ACE view', async function () {
+    await workbenchCSHealthMonitorOpen()
+    await workbenchExplorerOpen()
     await explorerFileEdit(['Controllers', 'SessionController'], { fromLine: 8, toLine: 8, snippet: '\n\n\n' })
+
     await workbenchCSHealthMonitorOpen()
 
     const csHealthMonitor = await new CSHealthMonitorPage().init()
@@ -47,7 +50,10 @@ describe('CodeScene Ext ACE', function () {
       await (await csHealthMonitor.find('autoRefactor')).click()
     })
 
-    const csACE = await new CSACEPage().init()
+    var csACE = await new CSACEPage().init()
     expect(await csACE.find('impactFile [matching: SessionController]')).to.exist
+    await (await csACE.find('enableACE')).click()
+    await csACE.init() // re-enter correct frame
+    expect(await csACE.find('acceptAutoRefactor')).to.exist
   });
 });

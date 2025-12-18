@@ -8,3 +8,11 @@ export async function workbenchCSHealthMonitorOpen(): Promise<void> {
         await codeSceneControl!.openView()
     })
 }
+
+export async function workbenchExplorerOpen(): Promise<void> {
+    await runWithRetry(async () => {
+        const activityBar = new ActivityBar()
+        const codeSceneControl = await waitFor(() => activityBar.getViewControl('Explorer'))
+        await codeSceneControl!.openView()
+    })
+}

@@ -1,6 +1,7 @@
 import type { Suite } from 'mocha';
 import { execa } from 'execa'
 import * as path from 'node:path'
+import { performance } from 'node:perf_hooks'
 import { VSBrowser } from 'vscode-extension-tester';
 import { loadWindowConfig } from '../config/windowConfig';
 
@@ -36,6 +37,15 @@ export async function commandExecute(directory: string, executable: string, ...a
 
 export async function pauseTest(durationMs = 5000): Promise<void> {
     await new Promise<void>((resolve) => setTimeout(resolve, durationMs))
+}
+
+/**
+ * Measures how long the provided action takes to run and resolves with the elapsed milliseconds.
+ */
+export async function measurePerformance(action: () => Promise<unknown> | unknown): Promise<number> {
+	const start = performance.now();
+	await action();
+	return performance.now() - start;
 }
 
 const SCRIPT = `
