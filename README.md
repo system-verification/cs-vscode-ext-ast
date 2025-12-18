@@ -12,10 +12,10 @@ This repository hosts [ExTester](https://github.com/redhat-developer/vscode-exte
 ```powershell
 cd g:/work/Customers/CodeScene/cs-ast
 npm install
-npm run test
+npm run test:sec
 ```
 
-The first test run downloads a dedicated copy of VS Code, ChromeDriver, and spins up the sample smoke test in `src/tests/sample.test.ts`.
+The first test run downloads a dedicated copy of VS Code, ChromeDriver, and runs the test suite.
 
 ## Manual Environment Setup (No Tests)
 Update **local.json** with the CodeScene authentication token
@@ -39,7 +39,7 @@ npm run prepare:vscode
 npm run build
 ```
 
-After this sequence, `.vscode-test/` contains the downloaded VS Code + ChromeDriver pair, your VSIX payload is staged, the tokenized settings file exists, and the TypeScript sources are compiled. Whenever you are ready to execute the suite, re-export the token if you start a new shell and run `npm test`.
+After this sequence, `.vscode-test/` contains the downloaded VS Code + ChromeDriver pair, your VSIX payload is staged, the tokenized settings file exists, and the TypeScript sources are compiled. Whenever you are ready to execute the suite, re-export the token if you start a new shell and run `npm test out/tests/testXX.js`.
 
 When a token is updated in **local.json**, rerun:
 - npm run prepare:token
