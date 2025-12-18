@@ -12,7 +12,9 @@ This repository hosts [ExTester](https://github.com/redhat-developer/vscode-exte
 ```powershell
 cd g:/work/Customers/CodeScene/cs-ast
 npm install
-npm run test:sec
+npm run build
+# Create and edit local.json (see below)
+npm run test:seq
 ```
 
 The first test run downloads a dedicated copy of VS Code, ChromeDriver, and runs the test suite.
@@ -197,4 +199,5 @@ package.json         # Script + dependency wiring for extest
 
 1. Seed `.vscode-test` with any workspace files (e.g., copy your extension project into `.vscode-test/workspace`) or install it via additional `extest` CLI flags such as `--extensions_dir`.
 2. Expand `src/tests` with page-object driven suites that automate your extension UI.
+
 3. Consider installing the [ExTester Runner](https://marketplace.visualstudio.com/items?itemName=redhat.extester-runner) extension for an interactive test dashboard inside VS Code.
