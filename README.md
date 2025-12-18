@@ -52,9 +52,48 @@ When a token is updated in **local.json**, rerun:
 	- If `extester.local-vsix.json` exists, this command installs the listed VSIX files into the test instance before starting ExTester (handled via `scripts/apply-vsix-config.js`).
 	- Both `test` and `test:insiders` force VS Code to keep extensions under `.vscode-test/extensions`, so nothing leaks into your day-to-day VS Code profile.
 - `npm run test:insiders` – identical to `test` but requests the newest available VS Code build (via `--code_version max`)
+- `npm run test:seq` – runs all compiled tests sequentially (each file executed in its own ExTester invocation)
 - `npm run clean` – deletes compiled output plus the cached VS Code profile under `.vscode-test`
 - `npm run prepare:vscode` – copies a locally installed VS Code build (if configured) into `.vscode-test` so ExTester can reuse it without downloading
 - `npm run stage:vsix` – installs every VSIX listed in `extester.local-vsix.json` into `.vscode-test/extensions` without launching tests; run this whenever you want the ExTester Runner to pick up a freshly built extension
+
+### Running tests from the terminal (single file or all)
+
+- All tests (stable):
+	```powershell
+	npm run test
+	```
+- All tests sequentially (stable):
+	```powershell
+	npm run test:seq
+	```
+- Single test file (stable):
+	```powershell
+	npm run test -- ./out/tests/workbench.test.js
+	```
+- All tests (Insiders build of VS Code):
+	```powershell
+	npm run test:insiders
+	```
+- Single test file (Insiders build):
+	```powershell
+	npm run test:insiders -- ./out/tests/workbench.test.js
+	```
+
+Notes:
+- The wrapper `scripts/run-extest.js` accepts a test file or glob; if none is provided it defaults to `./out/tests/**/*.test.js`.
+- Tests are run from the compiled output under `out/`, so ensure `npm run build` (already part of the scripts) has produced the matching `.js` files.
+
+### Generating HTML reports
+
+- Configure mochawesome (already set in `mocharc.json`) to emit JSON artifacts without timestamps so filenames are predictable.
+- After running tests (including `npm run test:seq`), merge JSONs and build a consolidated HTML report:
+
+	```powershell
+	npm run report:merge
+	```
+
+- Output lives in `reports/mochawesome/` (JSON inputs + `report.html`). Delete that folder if you want a clean slate before another run.
 
 ## Window Size Configuration
 

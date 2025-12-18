@@ -11,7 +11,7 @@ export type RunWithRetryOptions = {
   timeoutMs?: number;
 };
 
-const DEFAULT_RETRY_TIMEOUT_MS = 5000;
+const DEFAULT_RETRY_TIMEOUT_MS = 10000;
 
 /**
  * Executes the provided action using async-retry with a default 5s timeout.

@@ -1,4 +1,14 @@
 {
   "timeout": 60000000,
-  "retries": 1
+  "retries": 1,
+  "reporter": "mochawesome",
+  "reporterOptions": {
+    "reportDir": "reports/mochawesome",
+    "reportFilename": "report",
+    "overwrite": false,
+    "html": false,
+    "json": true,
+    "quiet": true,
+    "timestamp": false
+  }
 }
